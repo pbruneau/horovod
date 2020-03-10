@@ -58,9 +58,11 @@ def _get_mpi_implementation_flags(tcp_flag):
         output.close()
 
     if exit_code == 0:
-        print(output_msg)
+        if settings.verbose >= 2:
+            print(output_msg)
         if 'Open MPI' in output_msg or 'OpenRTE' in output_msg:
-            print('in Open MPI')
+            if settings.verbose >= 2:
+                print('in Open MPI')
             return list(_OMPI_FLAGS), list(_NO_BINDING_ARGS)
         elif 'IBM Spectrum MPI' in output_msg:
             return list(_SMPI_FLAGS) if not tcp_flag else list(_SMPI_FLAGS_TCP), list(_SOCKET_BINDING_ARGS)
@@ -125,32 +127,35 @@ def mpi_run(settings, common_intfs, env, command, stdout=None, stderr=None, run_
     binding_args = settings.binding_args if settings.binding_args else ' '.join(impl_binding_args)
 
     # Pass all the env variables to the mpirun command.
-    mpirun_command = (
-        'mpirun --allow-run-as-root --tag-output '
-        '-np {num_proc} {hosts_arg} '
-        '{binding_args} '
-        '{mpi_args} '
-        '{ssh_port_arg} '
-        '{tcp_intf_arg} '
-        '{nccl_socket_intf_arg} '
-        '{output_filename_arg} '
-        '{env} {extra_mpi_args} {command}'  # expect a lot of environment variables
-        .format(num_proc=settings.num_proc,
-                hosts_arg=hosts_arg,
-                binding_args=binding_args,
-                mpi_args=' '.join(mpi_impl_flags),
-                tcp_intf_arg=tcp_intf_arg,
-                nccl_socket_intf_arg=nccl_socket_intf_arg,
-                ssh_port_arg=ssh_port_arg,
-                output_filename_arg='--output-filename ' + settings.output_filename
-                                    if settings.output_filename else '',
-                env=' '.join('-x %s' % key for key in sorted(env.keys())
-                             if env_util.is_exportable(key)),
+    #mpirun_command = (
+    #    'mpirun --allow-run-as-root --tag-output '
+    #    '-np {num_proc} {hosts_arg} '
+    #    '{binding_args} '
+    #    '{mpi_args} '
+    #    '{ssh_port_arg} '
+    #    '{tcp_intf_arg} '
+    #    '{nccl_socket_intf_arg} '
+    #    '{output_filename_arg} '
+    #    '{env} {extra_mpi_args} {command}'  # expect a lot of environment variables
+    #    .format(num_proc=settings.num_proc,
+    #            hosts_arg=hosts_arg,
+    #            binding_args=binding_args,
+    #            mpi_args=' '.join(mpi_impl_flags),
+    #            tcp_intf_arg=tcp_intf_arg,
+    #            nccl_socket_intf_arg=nccl_socket_intf_arg,
+    #            ssh_port_arg=ssh_port_arg,
+    #            output_filename_arg='--output-filename ' + settings.output_filename
+    #                                if settings.output_filename else '',
+    #            env=' '.join('-x %s' % key for key in sorted(env.keys())
+    #                         if env_util.is_exportable(key)),
 
-                extra_mpi_args=settings.extra_mpi_args if settings.extra_mpi_args else '',
-                command=' '.join(quote(par) for par in command))
-    )
+    #          extra_mpi_args=settings.extra_mpi_args if settings.extra_mpi_args else '',
+    #            command=' '.join(quote(par) for par in command))
+    #)
 
+    # PBR: hacked version
+    mpirun_command = ('mpirun {impl_flags} {command}'.format(impl_flags=mpi_impl_flags, command=command))
+    
     if settings.verbose >= 2:
         print(mpirun_command)
 
