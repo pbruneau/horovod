@@ -21,7 +21,10 @@ import os
 from horovod.run.common.util import env as env_util, safe_shell_exec, secret, codec
 
 # Open MPI Flags
-_OMPI_FLAGS = ['-mca pml ob1', '-mca btl ^openib']
+#_OMPI_FLAGS = ['-mca pml ob1', '-mca btl ^openib']
+# PBR: hack with my requirements
+_OMPI_FLAGS = ['-np 2', '-npernode 2', '-bind-to none', '-x NCCL_DEBUG=INFO', \
+               '-x LD_LIBRARY_PATH', '-x PATH', '-mca pml ob1', '-mca btl ^openib']
 # Spectrum MPI Flags
 _SMPI_FLAGS = ['-gpu']
 _SMPI_FLAGS_TCP = ['-tcp']
@@ -30,7 +33,9 @@ _MPICH_FLAGS = []
 # Threshold for large cluster MPI issues:
 _LARGE_CLUSTER_THRESHOLD = 64
 # No process binding args
-_NO_BINDING_ARGS = ['-bind-to none', '-map-by slot']
+# PBR: causes conflicts with requirements
+#_NO_BINDING_ARGS = ['-bind-to none', '-map-by slot']
+_NO_BINDING_ARGS = []
 # Process socket binding args
 _SOCKET_BINDING_ARGS = ['-bind-to socket', '-map-by socket', '-rank-by core']
 
