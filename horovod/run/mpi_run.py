@@ -58,7 +58,9 @@ def _get_mpi_implementation_flags(tcp_flag):
         output.close()
 
     if exit_code == 0:
+        print(output_msg)
         if 'Open MPI' in output_msg or 'OpenRTE' in output_msg:
+            print('in Open MPI')
             return list(_OMPI_FLAGS), list(_NO_BINDING_ARGS)
         elif 'IBM Spectrum MPI' in output_msg:
             return list(_SMPI_FLAGS) if not tcp_flag else list(_SMPI_FLAGS_TCP), list(_SOCKET_BINDING_ARGS)
