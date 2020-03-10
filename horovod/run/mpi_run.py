@@ -154,7 +154,8 @@ def mpi_run(settings, common_intfs, env, command, stdout=None, stderr=None, run_
     #)
 
     # PBR: hacked version
-    mpirun_command = ('mpirun {impl_flags} {command}'.format(impl_flags=mpi_impl_flags, command=command))
+    mpirun_command = ('mpirun {impl_flags} {command}'.format(impl_flags=' '.join(mpi_impl_flags), \
+                                                             command=' '.join(quote(par) for par in command)))
     
     if settings.verbose >= 2:
         print(mpirun_command)
