@@ -44,7 +44,7 @@ try:
 except ImportError:
     from pipes import quote
 
-def _get_mpi_implementation_flags(tcp_flag):
+def _get_mpi_implementation_flags(tcp_flag, verbose):
     output = six.StringIO()
     command = 'mpirun --version'
     try:
@@ -58,10 +58,10 @@ def _get_mpi_implementation_flags(tcp_flag):
         output.close()
 
     if exit_code == 0:
-        if settings.verbose >= 2:
+        if verbose >= 2:
             print(output_msg)
         if 'Open MPI' in output_msg or 'OpenRTE' in output_msg:
-            if settings.verbose >= 2:
+            if verbose >= 2:
                 print('in Open MPI')
             return list(_OMPI_FLAGS), list(_NO_BINDING_ARGS)
         elif 'IBM Spectrum MPI' in output_msg:
@@ -95,7 +95,7 @@ def mpi_run(settings, common_intfs, env, command, stdout=None, stderr=None, run_
                   Only used when settings.run_func_mode is True.
                   Defaults to safe_shell_exec.execute.
     """
-    mpi_impl_flags, impl_binding_args = _get_mpi_implementation_flags(settings.tcp_flag)
+    mpi_impl_flags, impl_binding_args = _get_mpi_implementation_flags(settings.tcp_flag, settings.verbose)
     if mpi_impl_flags is None:
         raise Exception(
             'horovodrun convenience script does not find an installed MPI.\n\n'
