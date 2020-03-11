@@ -145,7 +145,7 @@ def mpi_run(settings, common_intfs, env, command, stdout=None, stderr=None, run_
     #)
 
     # PBR: hacked version
-    mpi_impl_flags = ['--map-by ppr:2:node', '-bind-to none', '-x NCCL_DEBUG=INFO', \
+    mpi_impl_flags = ['-np 2', '-npernode 2', '-bind-to none', '-x NCCL_DEBUG=INFO', \
                       '-x LD_LIBRARY_PATH', '-x PATH', '-mca pml ob1', '-mca btl ^openib']
     mpirun_command = ('mpirun {impl_flags} {command}'.format(impl_flags=' '.join(mpi_impl_flags), \
                                                              command=' '.join(quote(par) for par in command)))
