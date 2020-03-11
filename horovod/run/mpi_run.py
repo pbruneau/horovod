@@ -86,7 +86,7 @@ def mpi_run(settings, common_intfs, env, command, stdout=None, stderr=None, run_
                   Only used when settings.run_func_mode is True.
                   Defaults to safe_shell_exec.execute.
     """
-    mpi_impl_flags, impl_binding_args = _get_mpi_implementation_flags(settings.tcp_flag, settings.verbose)
+    mpi_impl_flags, impl_binding_args = _get_mpi_implementation_flags(settings.tcp_flag)
     if mpi_impl_flags is None:
         raise Exception(
             'horovodrun convenience script does not find an installed MPI.\n\n'
